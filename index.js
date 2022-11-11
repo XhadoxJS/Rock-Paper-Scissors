@@ -8,23 +8,15 @@ function computerPlay() {
 function playRound(playerSelection, computerSelection) {
     playerSelection = playerSelection.toLowerCase();
     if (playerSelection == computerSelection) {
-        console.log(`This round is a tie! You and the computer have picked ${playerSelection}!`);
-        alert(`This round is a tie! You and the computer have picked ${playerSelection}!`);
         return 'tie'
     }
     else if ((playerSelection == 'rock' && computerSelection == 'paper') || (playerSelection == 'paper' && computerSelection == 'scissors') || (playerSelection == 'scissors' && computerSelection == 'rock')) {
-        console.log(`You lose this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`);
-        alert(`You lose this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`)
         return 'loser'
     }
     else if ((playerSelection == 'paper' && computerSelection == 'rock') || (playerSelection == 'scissors' && computerSelection == 'paper') || (playerSelection == 'rock' && computerSelection == 'scissors')) {
-        console.log(`You win this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`);
-        alert(`You win this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`);
-        return 'winner'
+       return 'winner'
     }
     else {
-        console.log('You have entered an invalid option! Please try again.');
-        alert('You have entered an invalid option! Please try again.');
         return 'invalid'
     }
   }
@@ -36,30 +28,67 @@ function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function game() {
-    let playerScore = 0;
-    let computerScore = 0;
-    for (let i = 0; i < 5; i++) {
-        let playerSelection = prompt('Do you pick rock, paper, or scissors?');
+function rockRound() {
+    let computerSelection = computerPlay();
+    return playRound('rock',computerSelection)
+}
+function paperRound() {
+    let computerSelection = computerPlay();
+    return playRound('paper',computerSelection)
+}
+function scissorsRound() {
+    let computerSelection = computerPlay();
+    return playRound('scissors',computerSelection)
+}
+let playerScore = 0;
+let computerScore = 0;
+let roundsPlayed = 0;
+const buttons = document.querySelectorAll('button');
+const pScore = document.getElementById('span1');
+const cScore = document.getElementById('span2');
+const winner = document.getElementById('roundWinner')
+const rPlayed = document.getElementById('span3');
+
+buttons.forEach((button) => {
+    button.addEventListener('click', function(e) {
+        if (e.target.id == 'reset' || computerScore == 5 || playerScore == 5) {
+            playerScore = 0;
+            computerScore = 0;
+            roundsPlayed = 0
+            pScore.textContent = `${playerScore}`;
+            cScore.textContent = `${computerScore}`;
+            winner.textContent = 'Begin!';
+            rPlayed.textContent = `${roundsPlayed}`;
+            return
+        }
+        let playerSelection = (e.target.id == 'rockBtn') ? 'rock' : (e.target.id == paperBtn) ? 'paper' : 'scissors';
         let computerSelection = computerPlay();
-        let roundWInner = playRound(playerSelection,computerSelection);
-        switch (roundWInner) {
+        let roundWinner = playRound(playerSelection, computerSelection);
+        ++roundsPlayed;
+        switch (roundWinner) {
             case 'tie':
+                winner.textContent = `This round is a tie! You and the computer have picked ${playerSelection}!`;
+                rPlayed.textContent = `${roundsPlayed}`;
             case 'invalid':
-                i--;
                 break
             case 'loser':
-                computerScore++;
+                ++computerScore;
+                cScore.textContent = `${computerScore}`;
+                rPlayed.textContent = `${roundsPlayed}`;
+                winner.textContent = `You lose this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`;
+                if (computerScore == 5) {
+                    winner.textContent = `You lose with a score of ${playerScore} to ${computerScore}!!!`
+                }
                 break
             case 'winner':
-                playerScore++;
+                ++playerScore;
+                pScore.textContent = `${playerScore}`;
+                rPlayed.textContent = `${roundsPlayed}`;
+                winner.textContent = `You win this round! You picked ${playerSelection} and the computer picked ${computerSelection}!`;
+                if (playerScore == 5) {
+                    winner.textContent = `You win with a score of ${playerScore} to ${computerScore}!!!`
+                }
                 break
         }
-    }
-
-    let gameWinner = (playerScore > computerScore) ? `You win the game with a score of ${playerScore} to ${computerScore}.` : `You lose the game with a score of ${playerScore} to ${computerScore}.`;
-    alert(gameWinner);
-    return(gameWinner)
-}
-
-console.log(game());
+    });
+});
